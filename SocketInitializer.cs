@@ -39,7 +39,7 @@ namespace ChatConsoleApp
             return localHost;
         }
 
-        public void ExecuteMessageCallback(IAsyncResult asyncResult)
+        private void ExecuteMessageCallback(IAsyncResult asyncResult)
         {
             try
             {
@@ -65,20 +65,39 @@ namespace ChatConsoleApp
             }
         }
 
-        public void StartServer(string localPortNumber, string remotePortnumber)
+        public void StartServer(string localPortNumber, string remotePortNumber)
         {
             try
             {
                 _epLocal = new IPEndPoint(IPAddress.Parse(_localIp), Convert.ToInt32(localPortNumber));
                 _socket.Bind(_epLocal);
 
-                _epRemote = new IPEndPoint(IPAddress.Parse(_remoteIP), Convert.ToInt32(remotePortnumber));
+                _epRemote = new IPEndPoint(IPAddress.Parse(_remoteIP), Convert.ToInt32(remotePortNumber));
                 _socket.Connect(_epRemote);
+
+                byte[] buffer = new byte[1500];
+                _socket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref _epRemote, new AsyncCallback(ExecuteMessageCallback), buffer);
             }
-            catch (System.Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
+            }
+        }
+
+        public void SendMessage(string msg)
+        {
+            try
+            {
+                ASCIIEncoding aSCIIEncoding = new ASCIIEncoding();
                 
-                throw;
+                byte[] message = new byte[1500];
+                message = aSCIIEncoding.GetBytes(msg);
+
+                _socket.Send(message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }

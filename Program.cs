@@ -8,7 +8,24 @@ namespace ChatConsoleApp
         {
             ProgramInitializer programInitializer = new ProgramInitializer();
             programInitializer.SetSocket();
-            programInitializer.StartServer("602", "602");
+
+            Console.WriteLine("Local Port: ");
+            string localPortNumber = Console.ReadLine();
+
+            Console.WriteLine("Other Local Port:");
+            string localPortNumber2 = Console.ReadLine();
+
+            programInitializer.StartServer(localPortNumber: localPortNumber, remotePortNumber: localPortNumber2);
+
+            Console.WriteLine("+++Chat Program+++");
+            
+            while (true)
+            {
+                Console.WriteLine("Send: ");
+
+                string message = Console.ReadLine();
+                programInitializer.SendMessage(message);
+            }
         }
     }
 }
